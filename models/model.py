@@ -2,31 +2,31 @@ import json
 
 
 class Model:
-    def ToJsonString(self):
+    def to_json_string(self):
         return json.dumps(self, cls=_Encoder, indent=2)
 
-    def ToJsonFile(self, file):
+    def to_json_file(self, file):
         json.dump(self, file, cls=_Encoder, indent=2)
 
     @classmethod
-    def FromJsonString(cls, json_str):
-        return cls.FromJson(json.loads(json_str))
+    def from_json_string(cls, json_str):
+        return cls.from_json(json.loads(json_str))
 
     @classmethod
-    def FromJsonFile(cls, file):
-        return cls.FromJson(json.load(file))
+    def from_json_file(cls, file):
+        return cls.from_json(json.load(file))
 
     @staticmethod
-    def FromJson(json_obj):
+    def from_json(json_obj):
         raise NotImplementedError
 
-    def ToObject(self):
+    def to_object(self):
         raise NotImplementedError
 
 
 class _Encoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, Model):
-            return o.ToObject()
+            return o.to_object()
 
         return json.JSONEncoder.default(self, o)

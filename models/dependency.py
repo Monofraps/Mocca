@@ -9,11 +9,11 @@ class Dependency(Model):
         self.branch = ''
         self.target_os = _TargetOsList()
 
-    def ToObject(self):
+    def to_object(self):
         return {'path': self.path, 'url': self.url, 'vcs': self.vcs, 'branch': self.branch, 'target_os': self.target_os}
 
     @staticmethod
-    def FromJson(json_obj):
+    def from_json(json_obj):
         dependency = Dependency()
         dependency.path = json_obj['path']
         dependency.url = json_obj['url']
@@ -27,7 +27,11 @@ class Dependency(Model):
         return dependency
 
     def __eq__(self, other):
-        return self.path == other.path and self.url == other.url and self.target_os == other.target_os and self.vcs == other.vcs and self.branch == other.branch
+        return self.path == other.path \
+            and self.url == other.url \
+            and self.target_os == other.target_os \
+            and self.vcs == other.vcs \
+            and self.branch == other.branch
 
 
 class _TargetOsList(list):

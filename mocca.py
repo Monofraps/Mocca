@@ -1,18 +1,21 @@
-from os import path, getcwd
-from models.project import Project
-from lib.DotMoccaGrabber import FindMoccaFile, ValidateMoccaFile
-from lib.Actors import MoccaDependency, MoccaProject
-from argparse import ArgumentParser
 import sys
+
+from os import path, getcwd
+from lib.MessageFormatter import set_verbosity, mocca_info
+from lib.StringInterpolator import interpolate_string
+from models.project import Project as ProjectModel
+from lib.DotMoccaGrabber import find_mocca_file, validate_mocca_file
+from lib.Actors import MoccaProject
+from argparse import ArgumentParser
 
 SCRIPT_DIR = path.dirname(path.realpath(__file__))
 WORKING_DIR = getcwd()
 
 
 def parse_args():
-    argumentParser = ArgumentParser(description='Mocca meta checkout tool')
+    argument_parser = ArgumentParser(description='Mocca meta checkout tool')
 
-    sub_parsers = argumentParser.add_subparsers(title='Sub commands', help='Commands')
+    sub_parsers = argument_parser.add_subparsers(title='Sub commands', help='Commands')
     add_dependency_parser = sub_parsers.add_parser('add', help='Adds a dependency')
     add_dependency_parser.add_argument(
         "path",
@@ -46,28 +49,51 @@ def parse_args():
     init_parser.set_defaults(func=cmd_init)
 
     dump_parser = sub_parsers.add_parser('dump', help='Dumps mocca project configuration')
+    dump_parser.add_argument(
+        '--interpolate', '-i',
+        help="Interpolate project variables",
+        action='store_true'
+    )
     dump_parser.set_defaults(func=cmd_dump)
 
-    argumentParser.add_argument(
+    add_var_parser = sub_parsers.add_parser('add-var', help='Adds a project variable to the .mocca file')
+    add_var_parser.add_argument(
+        "name",
+        help="Name of the variable",
+        type=str)
+    add_var_parser.add_argument(
+        "value",
+        help="Value of the variable",
+        type=str,
+        nargs='?',
+        default='<(env')
+    add_var_parser.set_defaults(func=cmd_add_var)
+
+    argument_parser.add_argument(
         "--mocca_file",
         "-f",
         metavar='file',
         help="Path to the project's .mocca file",
         type=str,
         default=None)
+    argument_parser.add_argument(
+        '--verbosity',
+        help="Verbosity level (0=Errors only, 1=Info and error messages, 2=All messages",
+        type=int,
+        default=1)
 
-    return argumentParser.parse_args()
+    return argument_parser.parse_args()
 
 
 def load_mocca_file(mocca_file=None):
     if mocca_file is None:
-        mocca_file = FindMoccaFile(WORKING_DIR)
+        mocca_file = find_mocca_file(WORKING_DIR)
 
-    ValidateMoccaFile(mocca_file)
+    validate_mocca_file(mocca_file)
 
     # Read project definition from .mocca file
     file_descriptor = open(mocca_file, 'r')
-    mocca_project = Project.FromJsonFile(file_descriptor)
+    mocca_project = ProjectModel.from_json_file(file_descriptor)
     file_descriptor.close()
 
     return MoccaProject(mocca_project, path.dirname(path.realpath(mocca_file)))
@@ -89,15 +115,35 @@ def cmd_sync(args, project):
 
 def cmd_init(args):
     file_descriptor = open(path.join(WORKING_DIR, '.mocca'), 'w')
-    Project().ToJsonFile(file_descriptor)
+    ProjectModel().to_json_file(file_descriptor)
     file_descriptor.close()
 
 
 def cmd_dump(args, project):
-    print(project.model.ToJsonString())
+    mocca_info("Dumping project config of {0}".format(path.join(project.root, '.mocca')))
+
+    string_representatoin = project.model.to_json_string()
+
+    if args.interpolate:
+        print(interpolate_string(string_representatoin, project.resolved_variables))
+    else:
+        print(project.model.to_json_string())
+
+
+def cmd_add_var(args, project):
+    mocca_info("Adding '{0}' to the project".format(args.name))
+    project.model.variables.add(args.name, args.value)
+
+    mocca_info("Added '{0}' with value '{1}'{2} to the project configuration".format(
+        args.name,
+        args.value,
+        " which resolves to '{0}'".format(project.model.variables.get(args.name)) if args.value == '<(env' else ''))
+    project.save()
 
 if __name__ == '__main__':
     args = parse_args()
+    set_verbosity(args.verbosity)
+
     if args.func is cmd_init:
         args.func(args)
         sys.exit(0)

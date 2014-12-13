@@ -2,4 +2,4 @@
 
 BASE_DIR=$(dirname "$0")
 
-exec python "$BASE_DIR/mocca.py" "$@"
+exec python3 "$BASE_DIR/mocca.py" "$@"
