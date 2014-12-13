@@ -51,7 +51,11 @@ class MoccaDependency:
         self._model = dependency_model
         self.root = project_root
         self.project_vars = variables
-        self.abs_path = os.path.abspath(os.path.join(self.root, self._get_model_path()))
+
+        if os.path.isabs(self._get_model_path()):
+            self.abs_path = self._get_model_path()
+        else:
+            self.abs_path = os.path.abspath(os.path.join(self.root, self._get_model_path()))
 
         self.branch = self._get_model_branch()
         if not self.branch:
