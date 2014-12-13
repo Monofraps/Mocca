@@ -1,0 +1,9 @@
+{
+    "dependencies": [
+        {
+        "path": "test",
+        "url": "urltes",
+        "target_os": []
+        }
+    ]
+}
