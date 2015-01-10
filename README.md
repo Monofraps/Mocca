@@ -17,7 +17,7 @@ until it finds a valid `.mocca` or throw an error at you if it doesn't find a su
 
 mocca add
 ---------
-To add a repository (Mocca calls it dependency) to your configuration simply run `mocca add local-checkout-path repo-url`.<br>
+To add a repository (Mocca calls it dependency) to your configuration simply run `mocca add repo-url local-checkout-path`.<br>
 This will add a new entry to your .mocca file.
 
 The `local-checkout-path` is the directory where the repository should be cloned into. Relative paths will be evaluated
@@ -32,7 +32,12 @@ You can also specify the branch which you want to clone using `--branch=cool-bra
 for git repositories and `default` for hg repositories by default.
 
 Mocca does also support specifying target OSs for each repository. Simply add `-t target-os-name`.<br>
-`mocca add -t=posix path url` for example will make sure the repository is ignored on all platforms but posix.
+`mocca add -t=linux path url` for example will make sure the repository is ignored on all platforms but linux. You can
+also specify a specific system architecture. `mocca add -t=linux:x86_64` will only checkout the repository if mocca is
+being run on a 64bit linux system.<br>
+Possible system specifiers (the part before `:`) are listed here (https://docs.python.org/3.5/library/sys.html#sys.platform)
+and (https://docs.python.org/3.5/library/platform.html#platform.machine) is used to determine the current target
+architecture.
 
 mocca add-var
 -------------
