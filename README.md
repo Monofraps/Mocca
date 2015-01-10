@@ -45,7 +45,7 @@ Another nice feature are project variables.
 
 Mocca will replace all occurrences of `{{VARIABLE_NAME}}` with the value of `VARIABLE_NAME`.
 
-This basically allows you to either define shorthands for long expressions or pull in environment variables. `mocca get-var`
+This basically allows you to either define shorthands for long expressions or pull in environment variables. `mocca add-var`
 takes two arguments. The first one is the name of the variable, the second is the variable's value.<br>
 Note: `<(env` is a special value. It tells Mocca to pull the actual value in from the system environment.
 
