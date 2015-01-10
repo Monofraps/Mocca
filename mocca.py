@@ -18,18 +18,19 @@ def parse_args():
     sub_parsers = argument_parser.add_subparsers(title='Sub commands', help='Commands')
     add_dependency_parser = sub_parsers.add_parser('add', help='Adds a dependency')
     add_dependency_parser.add_argument(
-        "path",
-        help="Path to where the repo should be checked out",
-        type=str)
-    add_dependency_parser.add_argument(
         "url",
         help="Repository url",
+        type=str)
+    add_dependency_parser.add_argument(
+        "path",
+        help="Path to where the repo should be checked out",
         type=str)
     add_dependency_parser.add_argument(
         "--target-os", '-t',
         help="The os on which this dependency is required",
         action='append',
-        type=str)
+        type=str,
+        default=[])
     add_dependency_parser.add_argument(
         "--vcs", '-v',
         help="Set the version control system",
