@@ -105,6 +105,7 @@ def cmd_add_dependency(args, project):
     dependency.url = args.url
     dependency.vcs = args.vcs
     dependency.branch = args.branch
+    dependency.target_os = args.target_os
 
     project.save()
 

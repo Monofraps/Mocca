@@ -1,10 +1,13 @@
 import os
+import sys
+import platform
 import subprocess
 from .MessageFormatter import mocca_info, mocca_debug
 from .StringInterpolator import interpolate_string
 
 # The OS we're running on will be used to selectively skip dependencies
-target_os = os.name
+target_os = sys.platform
+target_arch = platform.machine()
 
 
 class MoccaProject:
@@ -66,8 +69,18 @@ class MoccaDependency:
 
     def sync(self):
         """ Syncs the dependency """
-        if target_os not in self._model.target_os and not len(self._model.target_os) == 0:
-            return
+        mocca_debug("Target OS: {0}:{1}".format(target_os, target_arch))
+        if not len(self._model.target_os) == 0:
+            is_target_os = False
+            for tos in self._model.target_os:
+                if tos.split(':')[0] != target_os:
+                    continue
+                if ':' in tos and tos.split(':')[1] != target_arch:
+                    continue
+                is_target_os = True
+            if not is_target_os:
+                mocca_info("Skipping {0} because target os requirement not met".format(self._model.path))
+                return
 
         if not os.path.exists(self.abs_path):
             os.makedirs(self.abs_path)
