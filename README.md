@@ -35,8 +35,8 @@ Mocca does also support specifying target OSs for each repository. Simply add `-
 `mocca add -t=linux path url` for example will make sure the repository is ignored on all platforms but linux. You can
 also specify a specific system architecture. `mocca add -t=linux:x86_64` will only checkout the repository if mocca is
 being run on a 64bit linux system.<br>
-Possible system specifiers (the part before `:`) are listed here (https://docs.python.org/3.5/library/sys.html#sys.platform)
-and (https://docs.python.org/3.5/library/platform.html#platform.machine) is used to determine the current target
+Possible system specifiers (the part before `:`) are listed here https://docs.python.org/3.5/library/sys.html#sys.platform
+and https://docs.python.org/3.5/library/platform.html#platform.machine is used to determine the current target
 architecture.
 
 mocca add-var
