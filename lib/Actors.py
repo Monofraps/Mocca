@@ -110,7 +110,25 @@ class MoccaDependency:
         if self._model.vcs == 'git':
             args += ['git', 'pull']
         elif self._model.vcs == 'hg':
-            args += ['hg', 'pull', '-u']
+            args += ['hg', 'pull']
+
+        mocca_debug(self.abs_path)
+        mocca_info(' '.join(args))
+        subprocess.Popen(args, cwd=self.abs_path).wait()
+
+        self.post_pull()
+
+    def post_pull(self):
+        """ Performs post-pull operations (i.e. branch/tag checkouts """
+        print("")
+        mocca_info("Running post-pull actions for {0} {1}"
+                   .format(self._get_model_path(), self.branch))
+
+        args = []
+        if self._model.vcs == 'git':
+            args += ['git', 'checkout', self.branch]
+        elif self._model.vcs == 'hg':
+            args += ['hg', 'up', self.branch]
 
         mocca_debug(self.abs_path)
         mocca_info(' '.join(args))
